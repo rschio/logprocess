@@ -6,7 +6,7 @@ type Log struct {
 	Response            Response            `json:"response"`
 	AuthenticatedEntity AuthenticatedEntity `json:"authenticated_entity"`
 	Route               Route               `json:"route"`
-	Service             WelcomeService      `json:"service"`
+	Service             Service             `json:"service"`
 	Latencies           Latencies           `json:"latencies"`
 	ClientIP            string              `json:"client_ip"`
 	StartedAt           int64               `json:"started_at"`
@@ -74,7 +74,7 @@ type RouteService struct {
 	ID string `json:"id"`
 }
 
-type WelcomeService struct {
+type Service struct {
 	ConnectTimeout int64  `json:"connect_timeout"`
 	CreatedAt      int64  `json:"created_at"`
 	Host           string `json:"host"`
