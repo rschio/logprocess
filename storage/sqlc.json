@@ -2,7 +2,7 @@
   "version": "1",
   "packages": [
     {
-	  "name": "logprocess",
+	  "name": "mysql",
 	  "path": "../processor/storage/mysql/",
       "schema": "schema.sql",
       "queries": "query.sql",
