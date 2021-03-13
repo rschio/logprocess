@@ -1,4 +1,4 @@
-package main
+package processor
 
 type Record struct {
 	Request             Request             `json:"request"`
@@ -13,7 +13,9 @@ type Record struct {
 }
 
 type AuthenticatedEntity struct {
-	ConsumerID string `json:"consumer_id"`
+	ConsumerID struct {
+		UUID string `json:"uuid"`
+	} `json:"consumer_id"`
 }
 
 type Latencies struct {
@@ -26,8 +28,8 @@ type Request struct {
 	Method      string         `json:"method"`
 	URI         string         `json:"uri"`
 	URL         string         `json:"url"`
-	Size        string         `json:"size"`
-	Querystring Querystring    `json:"querystring"`
+	Size        int            `json:"size"`
+	Querystring []string       `json:"querystring"`
 	Headers     RequestHeaders `json:"headers"`
 }
 
@@ -37,12 +39,9 @@ type RequestHeaders struct {
 	UserAgent string `json:"user-agent"`
 }
 
-type Querystring struct {
-}
-
 type Response struct {
 	Status  int64           `json:"status"`
-	Size    string          `json:"size"`
+	Size    int             `json:"size"`
 	Headers ResponseHeaders `json:"headers"`
 }
 
@@ -58,7 +57,7 @@ type ResponseHeaders struct {
 
 type Route struct {
 	CreatedAt     int64        `json:"created_at"`
-	Hosts         interface{}  `json:"hosts"`
+	Hosts         []string     `json:"hosts"`
 	ID            string       `json:"id"`
 	Methods       []string     `json:"methods"`
 	Paths         []string     `json:"paths"`
