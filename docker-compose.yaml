@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    build:
+      context: storage/mysql
+      dockerfile: Dockerfile
+    ports:
+      - '3306:3306'
+    env_file:
+        env.env
+    volumes:
+        - './storage/mysql/data:/var/lib/mysql'

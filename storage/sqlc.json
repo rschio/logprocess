@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "packages": [
+    {
+	  "name": "logprocess",
+	  "path": "../processor/storage/mysql/",
+      "schema": "schema.sql",
+      "queries": "query.sql",
+      "engine": "mysql"
+    }
+  ]
+}
