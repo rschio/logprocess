@@ -48,7 +48,7 @@ INSERT INTO routes (
 	strip_path
 ) VALUES (
 	?,?,?,?,?,?,?,?,?,?
-);
+) ON DUPLICATE KEY UPDATE id=id;
 
 -- name: InsertService :execresult
 INSERT INTO services (
@@ -66,7 +66,7 @@ INSERT INTO services (
 	retries
 ) VALUES (
 	?,?,?,?,?,?,?,?,?,?,?,?
-);
+) ON DUPLICATE KEY UPDATE id=id;
 	
 -- name: InsertRecord :execresult
 INSERT INTO records (

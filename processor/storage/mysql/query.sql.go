@@ -317,7 +317,7 @@ INSERT INTO routes (
 	strip_path
 ) VALUES (
 	?,?,?,?,?,?,?,?,?,?
-)
+) ON DUPLICATE KEY UPDATE id=id
 `
 
 type InsertRouteParams struct {
@@ -364,7 +364,7 @@ INSERT INTO services (
 	retries
 ) VALUES (
 	?,?,?,?,?,?,?,?,?,?,?,?
-)
+) ON DUPLICATE KEY UPDATE id=id
 `
 
 type InsertServiceParams struct {

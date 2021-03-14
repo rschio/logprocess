@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/rschio/logprocess/processor"
 )
 
@@ -60,18 +59,14 @@ func (m *MySQL) InsertRecord(ctx context.Context, r *processor.Record) error {
 
 	res, err = q.InsertRoute(ctx, *routeParams)
 	if err != nil {
-		if !isDupEntryErr(err) {
-			tx.Rollback()
-			return err
-		}
+		tx.Rollback()
+		return err
 	}
 
 	res, err = q.InsertService(ctx, *serviceParams)
 	if err != nil {
-		if !isDupEntryErr(err) {
-			tx.Rollback()
-			return err
-		}
+		tx.Rollback()
+		return err
 	}
 
 	params := InsertRecordParams{
@@ -97,13 +92,4 @@ func (m *MySQL) InsertRecord(ctx context.Context, r *processor.Record) error {
 		return err
 	}
 	return nil
-}
-
-func isDupEntryErr(err error) bool {
-	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
-		if mysqlErr.Number == 1062 {
-			return true
-		}
-	}
-	return false
 }
