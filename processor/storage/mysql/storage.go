@@ -17,20 +17,12 @@ func NewMySQL(db *sql.DB) *MySQL {
 	return &MySQL{db: db, q: New(db)}
 }
 
-func toServiceLatencies(avgLat AverageLatencyByServiceRow) processor.ServiceLatencies {
-	sl := processor.ServiceLatencies{ID: avgLat.ID, Name: avgLat.Name}
-	sl.AvgLatencies.Proxy = int64(avgLat.AvgProxyLatency)
-	sl.AvgLatencies.Gateway = int64(avgLat.AvgGatewayLatency)
-	sl.AvgLatencies.Request = int64(avgLat.AvgRequestLatency)
-	return sl
-}
-
-func toServicesLatencies(avgLats []AverageLatencyByServiceRow) []processor.ServiceLatencies {
-	slice := make([]processor.ServiceLatencies, len(avgLats))
-	for i, avgLat := range avgLats {
-		slice[i] = toServiceLatencies(avgLat)
+func (m *MySQL) ConsumerReport(ctx context.Context, id string) ([]processor.ConsumerReportRow, error) {
+	rows, err := m.q.GetConsumerRequests(ctx, id)
+	if err != nil {
+		return nil, err
 	}
-	return slice
+	return toConsumerReportRows(rows), nil
 }
 
 func (m *MySQL) AverageServicesLatencies(ctx context.Context) ([]processor.ServiceLatencies, error) {

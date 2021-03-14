@@ -77,3 +77,31 @@ func toInsertRequestParams(r *processor.Request) (*InsertRequestParams, error) {
 	}
 	return p, nil
 }
+
+func toServiceLatencies(avgLat AverageLatencyByServiceRow) processor.ServiceLatencies {
+	sl := processor.ServiceLatencies{ID: avgLat.ID, Name: avgLat.Name}
+	sl.AvgLatencies.Proxy = int64(avgLat.AvgProxyLatency)
+	sl.AvgLatencies.Gateway = int64(avgLat.AvgGatewayLatency)
+	sl.AvgLatencies.Request = int64(avgLat.AvgRequestLatency)
+	return sl
+}
+
+func toServicesLatencies(avgLats []AverageLatencyByServiceRow) []processor.ServiceLatencies {
+	slice := make([]processor.ServiceLatencies, len(avgLats))
+	for i, avgLat := range avgLats {
+		slice[i] = toServiceLatencies(avgLat)
+	}
+	return slice
+}
+
+func toConsumerReportRow(row GetConsumerRequestsRow) processor.ConsumerReportRow {
+	return processor.ConsumerReportRow(row)
+}
+
+func toConsumerReportRows(rows []GetConsumerRequestsRow) []processor.ConsumerReportRow {
+	slice := make([]processor.ConsumerReportRow, len(rows))
+	for i, row := range rows {
+		slice[i] = toConsumerReportRow(row)
+	}
+	return slice
+}

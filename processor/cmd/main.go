@@ -19,7 +19,7 @@ var (
 )
 
 func connectDB() processor.Storage {
-	info := fmt.Sprintf("%s:%s@/%s", usrenv, passenv, dbenv)
+	info := fmt.Sprintf("%s:%s@/%s?parseTime=true", usrenv, passenv, dbenv)
 	conn, err := sql.Open("mysql", info)
 	if err != nil {
 		log.Fatalf("failed to connect DB: %v", err)
@@ -48,7 +48,7 @@ func main() {
 	//		log.Println(err)
 	//	}
 	ctx := context.Background()
-	as, err := db.AverageServicesLatencies(ctx)
+	as, err := db.ConsumerReport(ctx, "30ce0ab9-c732-3429-80ea-539030680568")
 	if err != nil {
 		log.Fatal(err)
 	}
