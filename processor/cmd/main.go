@@ -48,7 +48,7 @@ func main() {
 	//		log.Println(err)
 	//	}
 	ctx := context.Background()
-	as, err := db.ConsumerReport(ctx, "30ce0ab9-c732-3429-80ea-539030680568")
+	as, err := db.ServiceReport(ctx, "c3e86413-648a-3552-90c3-b13491ee07d6")
 	if err != nil {
 		log.Fatal(err)
 	}

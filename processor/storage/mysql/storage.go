@@ -17,12 +17,20 @@ func NewMySQL(db *sql.DB) *MySQL {
 	return &MySQL{db: db, q: New(db)}
 }
 
-func (m *MySQL) ConsumerReport(ctx context.Context, id string) ([]processor.ConsumerReportRow, error) {
+func (m *MySQL) ServiceReport(ctx context.Context, id string) ([]processor.ReportRow, error) {
+	rows, err := m.q.GetServiceRequests(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return toReportRowsService(rows), nil
+}
+
+func (m *MySQL) ConsumerReport(ctx context.Context, id string) ([]processor.ReportRow, error) {
 	rows, err := m.q.GetConsumerRequests(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return toConsumerReportRows(rows), nil
+	return toReportRows(rows), nil
 }
 
 func (m *MySQL) AverageServicesLatencies(ctx context.Context) ([]processor.ServiceLatencies, error) {
