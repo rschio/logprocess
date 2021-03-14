@@ -17,6 +17,30 @@ func NewMySQL(db *sql.DB) *MySQL {
 	return &MySQL{db: db, q: New(db)}
 }
 
+func toServiceLatencies(avgLat AverageLatencyByServiceRow) processor.ServiceLatencies {
+	sl := processor.ServiceLatencies{ID: avgLat.ID, Name: avgLat.Name}
+	sl.AvgLatencies.Proxy = int64(avgLat.AvgProxyLatency)
+	sl.AvgLatencies.Gateway = int64(avgLat.AvgGatewayLatency)
+	sl.AvgLatencies.Request = int64(avgLat.AvgRequestLatency)
+	return sl
+}
+
+func toServicesLatencies(avgLats []AverageLatencyByServiceRow) []processor.ServiceLatencies {
+	slice := make([]processor.ServiceLatencies, len(avgLats))
+	for i, avgLat := range avgLats {
+		slice[i] = toServiceLatencies(avgLat)
+	}
+	return slice
+}
+
+func (m *MySQL) AverageServicesLatencies(ctx context.Context) ([]processor.ServiceLatencies, error) {
+	avgLats, err := m.q.AverageLatencyByService(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return toServicesLatencies(avgLats), nil
+}
+
 func (m *MySQL) InsertRecord(ctx context.Context, r *processor.Record) error {
 	respParams, err := toInsertResponseParams(&r.Response)
 	if err != nil {

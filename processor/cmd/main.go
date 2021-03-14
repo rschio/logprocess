@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -34,26 +32,33 @@ func connectDB() processor.Storage {
 
 func main() {
 	db := connectDB()
-	sc := bufio.NewScanner(os.Stdin)
-	logs := make([]processor.Record, 0, 200)
-	for sc.Scan() {
-		jsonlog := sc.Bytes()
-		l := processor.Record{}
-		json.Unmarshal(jsonlog, &l)
-		if err := processor.ValidRecord(&l); err != nil {
-			log.Println(err)
-		} else {
-			logs = append(logs, l)
-		}
-	}
-	if err := sc.Err(); err != nil {
-		log.Println(err)
-	}
+	//	sc := bufio.NewScanner(os.Stdin)
+	//	logs := make([]processor.Record, 0, 200)
+	//	for sc.Scan() {
+	//		jsonlog := sc.Bytes()
+	//		l := processor.Record{}
+	//		json.Unmarshal(jsonlog, &l)
+	//		if err := processor.ValidRecord(&l); err != nil {
+	//			log.Println(err)
+	//		} else {
+	//			logs = append(logs, l)
+	//		}
+	//	}
+	//	if err := sc.Err(); err != nil {
+	//		log.Println(err)
+	//	}
 	ctx := context.Background()
-	for _, l := range logs {
-		err := db.InsertRecord(ctx, &l)
-		if err != nil {
-			log.Fatal(err)
-		}
+	as, err := db.AverageServicesLatencies(ctx)
+	if err != nil {
+		log.Fatal(err)
 	}
+	for _, a := range as {
+		fmt.Printf("%+v\n", a)
+	}
+	//for _, l := range logs {
+	//	err := db.InsertRecord(ctx, &l)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//}
 }

@@ -9,10 +9,13 @@ SELECT *
 
 -- name: AverageLatencyByService :many
 SELECT 
-	AVG(proxy_latency) AS proxy_latency, 
-	AVG(gateway_latency) AS gateway_latency, 
-	AVG(request_latency) AS request_latency
-	FROM records 
+	s.id, 
+	s.name, 
+	ROUND(AVG(proxy_latency),   0)   AS avg_proxy_latency,
+	ROUND(AVG(gateway_latency), 0) AS avg_gateway_latency,
+	ROUND(AVG(request_latency), 0) AS avg_request_latency
+	FROM  records 
+	LEFT JOIN services s ON records.service_id = s.id 
 	GROUP BY service_id
 ;
 

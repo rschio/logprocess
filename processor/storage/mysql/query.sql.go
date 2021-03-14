@@ -11,17 +11,22 @@ import (
 
 const averageLatencyByService = `-- name: AverageLatencyByService :many
 SELECT 
-	AVG(proxy_latency) AS proxy_latency, 
-	AVG(gateway_latency) AS gateway_latency, 
-	AVG(request_latency) AS request_latency
-	FROM records 
+	s.id, 
+	s.name, 
+	ROUND(AVG(proxy_latency),   0)   AS avg_proxy_latency,
+	ROUND(AVG(gateway_latency), 0) AS avg_gateway_latency,
+	ROUND(AVG(request_latency), 0) AS avg_request_latency
+	FROM  records 
+	LEFT JOIN services s ON records.service_id = s.id 
 	GROUP BY service_id
 `
 
 type AverageLatencyByServiceRow struct {
-	ProxyLatency   interface{}
-	GatewayLatency interface{}
-	RequestLatency interface{}
+	ID                string
+	Name              string
+	AvgProxyLatency   float64
+	AvgGatewayLatency float64
+	AvgRequestLatency float64
 }
 
 func (q *Queries) AverageLatencyByService(ctx context.Context) ([]AverageLatencyByServiceRow, error) {
@@ -33,7 +38,13 @@ func (q *Queries) AverageLatencyByService(ctx context.Context) ([]AverageLatency
 	var items []AverageLatencyByServiceRow
 	for rows.Next() {
 		var i AverageLatencyByServiceRow
-		if err := rows.Scan(&i.ProxyLatency, &i.GatewayLatency, &i.RequestLatency); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.AvgProxyLatency,
+			&i.AvgGatewayLatency,
+			&i.AvgRequestLatency,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
