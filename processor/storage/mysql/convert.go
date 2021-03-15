@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rschio/logprocess/processor"
 )
 
@@ -30,8 +31,9 @@ func toInsertRouteParams(r *processor.Route) *InsertRouteParams {
 		ID:            r.ID,
 		CreatedAt:     time.Unix(r.CreatedAt, 0),
 		UpdatedAt:     time.Unix(r.UpdatedAt, 0),
-		Hosts:         strings.Join(r.Hosts, ","),
+		Hosts:         r.Hosts,
 		Methods:       strings.Join(r.Methods, ","),
+		Paths:         strings.Join(r.Paths, ","),
 		Protocols:     strings.Join(r.Protocols, ","),
 		RegexPriority: r.RegexPriority,
 		ServiceID:     r.Service.ID,
@@ -48,6 +50,7 @@ func toInsertRouteParams(r *processor.Route) *InsertRouteParams {
 func toInsertResponseParams(r *processor.Response) (*InsertResponseParams, error) {
 	h := r.Headers
 	p := &InsertResponseParams{
+		ID:                            uuid.NewString(),
 		Status:                        r.Status,
 		Via:                           h.Via,
 		Size:                          int64(r.Size),
@@ -67,10 +70,12 @@ func toInsertResponseParams(r *processor.Response) (*InsertResponseParams, error
 
 func toInsertRequestParams(r *processor.Request) (*InsertRequestParams, error) {
 	p := &InsertRequestParams{
+		ID:              uuid.NewString(),
 		Method:          r.Method,
 		Uri:             r.URI,
 		Url:             r.URL,
 		Size:            int64(r.Size),
+		Querystring:     strings.Join(r.Querystring, ","),
 		HeaderAccept:    r.Headers.Accept,
 		HeaderHost:      r.Headers.Host,
 		HeaderUserAgent: r.Headers.UserAgent,

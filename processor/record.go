@@ -57,7 +57,7 @@ type ResponseHeaders struct {
 
 type Route struct {
 	CreatedAt     int64        `json:"created_at"`
-	Hosts         []string     `json:"hosts"`
+	Hosts         string       `json:"hosts"`
 	ID            string       `json:"id"`
 	Methods       []string     `json:"methods"`
 	Paths         []string     `json:"paths"`

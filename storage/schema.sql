@@ -1,9 +1,10 @@
 CREATE TABLE IF NOT EXISTS requests (
-	id BIGINT AUTO_INCREMENT NOT NULL,
+	id varchar(255) NOT NULL,
 	method varchar(255) NOT NULL,
 	uri varchar(255) NOT NULL,
 	url varchar(255) NOT NULL,
 	size BIGINT NOT NULL,
+	querystring varchar(255) NOT NULL,
 	header_accept varchar(255) NOT NULL,
 	header_host varchar(255) NOT NULL,
 	header_user_agent varchar(255) NOT NULL,
@@ -11,7 +12,7 @@ CREATE TABLE IF NOT EXISTS requests (
 );
 
 CREATE TABLE IF NOT EXISTS responses (
-	id BIGINT AUTO_INCREMENT NOT NULL,
+	id varchar(255) NOT NULL,
 	status BIGINT NOT NULL,
 	size BIGINT NOT NULL,
 	content_length BIGINT NOT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE IF NOT EXISTS routes (
 	updated_at TIMESTAMP NOT NULL,
 	hosts varchar(255) NOT NULL,
 	methods varchar(255) NOT NULL,
+	paths varchar(255) NOT NULL,
 	preserve_host BOOLEAN NOT NULL,
 	protocols varchar(255) NOT NULL,
 	regex_priority BIGINT NOT NULL,
@@ -59,8 +61,8 @@ CREATE TABLE IF NOT EXISTS records (
 	id BIGINT AUTO_INCREMENT NOT NULL,
 	consumer_id varchar(255) NOT NULL,
 	upstream_uri varchar(255) NOT NULL,
-	response_id BIGINT NOT NULL,
-	request_id BIGINT NOT NULL,
+	response_id varchar(255) NOT NULL,
+	request_id varchar(255) NOT NULL,
 	route_id varchar(255) NOT NULL,	
 	service_id varchar(255) NOT NULL,
 	proxy_latency BIGINT NOT NULL,

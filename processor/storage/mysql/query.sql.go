@@ -85,6 +85,7 @@ SELECT
 	rq.uri AS req_URI,
 	rq.url AS req_URL,
 	rq.size AS req_Size,
+	rq.querystring AS req_querystring,
 	rq.header_accept AS req_header_accept,
 	rq.header_host AS req_header_host,
 	rq.header_user_agent AS req_user_agent
@@ -98,8 +99,8 @@ type GetConsumerRequestsRow struct {
 	ID                               int64
 	ConsumerID                       string
 	UpstreamURI                      string
-	ResponseID                       int64
-	RequestID                        int64
+	ResponseID                       string
+	RequestID                        string
 	RouteID                          string
 	ServiceID                        string
 	ProxyLatency                     int64
@@ -120,6 +121,7 @@ type GetConsumerRequestsRow struct {
 	ReqURI                           string
 	ReqURL                           string
 	ReqSize                          int64
+	ReqQuerystring                   string
 	ReqHeaderAccept                  string
 	ReqHeaderHost                    string
 	ReqUserAgent                     string
@@ -160,6 +162,7 @@ func (q *Queries) GetConsumerRequests(ctx context.Context, consumerID string) ([
 			&i.ReqURI,
 			&i.ReqURL,
 			&i.ReqSize,
+			&i.ReqQuerystring,
 			&i.ReqHeaderAccept,
 			&i.ReqHeaderHost,
 			&i.ReqUserAgent,
@@ -178,7 +181,7 @@ func (q *Queries) GetConsumerRequests(ctx context.Context, consumerID string) ([
 }
 
 const getRecords = `-- name: GetRecords :many
-SELECT r.id, consumer_id, upstream_uri, response_id, request_id, route_id, r.service_id, proxy_latency, gateway_latency, request_latency, client_ip, started_at, rp.id, status, rp.size, content_length, via, connection, access_control_allow_credentials, access_control_allow_origin, content_type, server, rq.id, method, uri, url, rq.size, header_accept, header_host, header_user_agent, rt.id, rt.created_at, rt.updated_at, hosts, methods, preserve_host, protocols, regex_priority, rt.service_id, strip_path, s.id, s.created_at, s.updated_at, host, name, path, port, protocol, read_timeout, write_timeout, connect_timeout, retries 
+SELECT r.id, consumer_id, upstream_uri, response_id, request_id, route_id, r.service_id, proxy_latency, gateway_latency, request_latency, client_ip, started_at, rp.id, status, rp.size, content_length, via, connection, access_control_allow_credentials, access_control_allow_origin, content_type, server, rq.id, method, uri, url, rq.size, querystring, header_accept, header_host, header_user_agent, rt.id, rt.created_at, rt.updated_at, hosts, methods, paths, preserve_host, protocols, regex_priority, rt.service_id, strip_path, s.id, s.created_at, s.updated_at, host, name, path, port, protocol, read_timeout, write_timeout, connect_timeout, retries 
 	FROM records r
 	JOIN responses rp ON r.response_id = rp.id
 	JOIN requests rq ON r.request_id = rq.id
@@ -190,8 +193,8 @@ type GetRecordsRow struct {
 	ID                            int64
 	ConsumerID                    string
 	UpstreamUri                   string
-	ResponseID                    int64
-	RequestID                     int64
+	ResponseID                    string
+	RequestID                     string
 	RouteID                       string
 	ServiceID                     string
 	ProxyLatency                  int64
@@ -199,7 +202,7 @@ type GetRecordsRow struct {
 	RequestLatency                int64
 	ClientIp                      string
 	StartedAt                     time.Time
-	ID_2                          int64
+	ID_2                          string
 	Status                        int64
 	Size                          int64
 	ContentLength                 int64
@@ -209,11 +212,12 @@ type GetRecordsRow struct {
 	AccessControlAllowOrigin      string
 	ContentType                   string
 	Server                        string
-	ID_3                          int64
+	ID_3                          string
 	Method                        string
 	Uri                           string
 	Url                           string
 	Size_2                        int64
+	Querystring                   string
 	HeaderAccept                  string
 	HeaderHost                    string
 	HeaderUserAgent               string
@@ -222,6 +226,7 @@ type GetRecordsRow struct {
 	UpdatedAt                     time.Time
 	Hosts                         string
 	Methods                       string
+	Paths                         string
 	PreserveHost                  int32
 	Protocols                     string
 	RegexPriority                 int64
@@ -278,6 +283,7 @@ func (q *Queries) GetRecords(ctx context.Context) ([]GetRecordsRow, error) {
 			&i.Uri,
 			&i.Url,
 			&i.Size_2,
+			&i.Querystring,
 			&i.HeaderAccept,
 			&i.HeaderHost,
 			&i.HeaderUserAgent,
@@ -286,6 +292,7 @@ func (q *Queries) GetRecords(ctx context.Context) ([]GetRecordsRow, error) {
 			&i.UpdatedAt,
 			&i.Hosts,
 			&i.Methods,
+			&i.Paths,
 			&i.PreserveHost,
 			&i.Protocols,
 			&i.RegexPriority,
@@ -344,6 +351,7 @@ SELECT
 	rq.uri AS req_URI,
 	rq.url AS req_URL,
 	rq.size AS req_Size,
+	rq.querystring AS req_querystring,
 	rq.header_accept AS req_header_accept,
 	rq.header_host AS req_header_host,
 	rq.header_user_agent AS req_user_agent
@@ -357,8 +365,8 @@ type GetServiceRequestsRow struct {
 	ID                               int64
 	ConsumerID                       string
 	UpstreamURI                      string
-	ResponseID                       int64
-	RequestID                        int64
+	ResponseID                       string
+	RequestID                        string
 	RouteID                          string
 	ServiceID                        string
 	ProxyLatency                     int64
@@ -379,6 +387,7 @@ type GetServiceRequestsRow struct {
 	ReqURI                           string
 	ReqURL                           string
 	ReqSize                          int64
+	ReqQuerystring                   string
 	ReqHeaderAccept                  string
 	ReqHeaderHost                    string
 	ReqUserAgent                     string
@@ -419,6 +428,7 @@ func (q *Queries) GetServiceRequests(ctx context.Context, serviceID string) ([]G
 			&i.ReqURI,
 			&i.ReqURL,
 			&i.ReqSize,
+			&i.ReqQuerystring,
 			&i.ReqHeaderAccept,
 			&i.ReqHeaderHost,
 			&i.ReqUserAgent,
@@ -457,8 +467,8 @@ INSERT INTO records (
 type InsertRecordParams struct {
 	ConsumerID     string
 	UpstreamUri    string
-	ResponseID     int64
-	RequestID      int64
+	ResponseID     string
+	RequestID      string
 	RouteID        string
 	ServiceID      string
 	ProxyLatency   int64
@@ -486,19 +496,21 @@ func (q *Queries) InsertRecord(ctx context.Context, arg InsertRecordParams) (sql
 
 const insertRequest = `-- name: InsertRequest :execresult
 INSERT INTO requests (
-	method, uri, url, size,
+	id, method, uri, url, size, querystring,
 	header_accept, header_host,
 	header_user_agent
 ) VALUES (
-	?,?,?,?,?,?,?
+	?,?,?,?,?,?,?,?,?
 )
 `
 
 type InsertRequestParams struct {
+	ID              string
 	Method          string
 	Uri             string
 	Url             string
 	Size            int64
+	Querystring     string
 	HeaderAccept    string
 	HeaderHost      string
 	HeaderUserAgent string
@@ -506,10 +518,12 @@ type InsertRequestParams struct {
 
 func (q *Queries) InsertRequest(ctx context.Context, arg InsertRequestParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, insertRequest,
+		arg.ID,
 		arg.Method,
 		arg.Uri,
 		arg.Url,
 		arg.Size,
+		arg.Querystring,
 		arg.HeaderAccept,
 		arg.HeaderHost,
 		arg.HeaderUserAgent,
@@ -518,15 +532,16 @@ func (q *Queries) InsertRequest(ctx context.Context, arg InsertRequestParams) (s
 
 const insertResponse = `-- name: InsertResponse :execresult
 INSERT INTO responses (
-	status, size, content_length,
+	id, status, size, content_length,
 	via, connection, access_control_allow_credentials,
 	access_control_allow_origin, content_type, server
 ) VALUES (
-	?,?,?,?,?,?,?,?,?
+	?,?,?,?,?,?,?,?,?,?
 )
 `
 
 type InsertResponseParams struct {
+	ID                            string
 	Status                        int64
 	Size                          int64
 	ContentLength                 int64
@@ -540,6 +555,7 @@ type InsertResponseParams struct {
 
 func (q *Queries) InsertResponse(ctx context.Context, arg InsertResponseParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, insertResponse,
+		arg.ID,
 		arg.Status,
 		arg.Size,
 		arg.ContentLength,
@@ -559,13 +575,14 @@ INSERT INTO routes (
 	updated_at,
 	hosts,
 	methods,
+	paths,
 	preserve_host,
 	protocols,
 	regex_priority,
 	service_id,
 	strip_path
 ) VALUES (
-	?,?,?,?,?,?,?,?,?,?
+	?,?,?,?,?,?,?,?,?,?,?
 ) ON DUPLICATE KEY UPDATE id=id
 `
 
@@ -575,6 +592,7 @@ type InsertRouteParams struct {
 	UpdatedAt     time.Time
 	Hosts         string
 	Methods       string
+	Paths         string
 	PreserveHost  int32
 	Protocols     string
 	RegexPriority int64
@@ -589,6 +607,7 @@ func (q *Queries) InsertRoute(ctx context.Context, arg InsertRouteParams) (sql.R
 		arg.UpdatedAt,
 		arg.Hosts,
 		arg.Methods,
+		arg.Paths,
 		arg.PreserveHost,
 		arg.Protocols,
 		arg.RegexPriority,

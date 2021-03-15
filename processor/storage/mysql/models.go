@@ -10,8 +10,8 @@ type Record struct {
 	ID             int64
 	ConsumerID     string
 	UpstreamUri    string
-	ResponseID     int64
-	RequestID      int64
+	ResponseID     string
+	RequestID      string
 	RouteID        string
 	ServiceID      string
 	ProxyLatency   int64
@@ -22,18 +22,19 @@ type Record struct {
 }
 
 type Request struct {
-	ID              int64
+	ID              string
 	Method          string
 	Uri             string
 	Url             string
 	Size            int64
+	Querystring     string
 	HeaderAccept    string
 	HeaderHost      string
 	HeaderUserAgent string
 }
 
 type Response struct {
-	ID                            int64
+	ID                            string
 	Status                        int64
 	Size                          int64
 	ContentLength                 int64
@@ -51,6 +52,7 @@ type Route struct {
 	UpdatedAt     time.Time
 	Hosts         string
 	Methods       string
+	Paths         string
 	PreserveHost  int32
 	Protocols     string
 	RegexPriority int64

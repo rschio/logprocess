@@ -34,6 +34,7 @@ SELECT
 	rq.uri AS req_URI,
 	rq.url AS req_URL,
 	rq.size AS req_Size,
+	rq.querystring AS req_querystring,
 	rq.header_accept AS req_header_accept,
 	rq.header_host AS req_header_host,
 	rq.header_user_agent AS req_user_agent
@@ -70,6 +71,7 @@ SELECT
 	rq.uri AS req_URI,
 	rq.url AS req_URL,
 	rq.size AS req_Size,
+	rq.querystring AS req_querystring,
 	rq.header_accept AS req_header_accept,
 	rq.header_host AS req_header_host,
 	rq.header_user_agent AS req_user_agent
@@ -95,20 +97,20 @@ SELECT
 
 -- name: InsertRequest :execresult
 INSERT INTO requests (
-	method, uri, url, size,
+	id, method, uri, url, size, querystring,
 	header_accept, header_host,
 	header_user_agent
 ) VALUES (
-	?,?,?,?,?,?,?
+	?,?,?,?,?,?,?,?,?
 );
 
 -- name: InsertResponse :execresult
 INSERT INTO responses (
-	status, size, content_length,
+	id, status, size, content_length,
 	via, connection, access_control_allow_credentials,
 	access_control_allow_origin, content_type, server
 ) VALUES (
-	?,?,?,?,?,?,?,?,?
+	?,?,?,?,?,?,?,?,?,?
 );
 
 -- name: InsertRoute :execresult
@@ -118,13 +120,14 @@ INSERT INTO routes (
 	updated_at,
 	hosts,
 	methods,
+	paths,
 	preserve_host,
 	protocols,
 	regex_priority,
 	service_id,
 	strip_path
 ) VALUES (
-	?,?,?,?,?,?,?,?,?,?
+	?,?,?,?,?,?,?,?,?,?,?
 ) ON DUPLICATE KEY UPDATE id=id;
 
 -- name: InsertService :execresult
