@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/dnlo/struct2csv"
 	_ "github.com/go-sql-driver/mysql"
@@ -50,32 +49,12 @@ func genReportCSV(ls []processor.ReportRow) {
 
 func main() {
 	db := connectDB()
-	sc := bufio.NewScanner(os.Stdin)
-	logs := make([]processor.Record, 0, 200)
-	for i := 0; sc.Scan(); i++ {
-		jsonlog := sc.Bytes()
-		l := processor.Record{}
-		err := json.Unmarshal(jsonlog, &l)
-		if err != nil {
-			log.Printf("%d: %v", i, err)
-			continue
-		}
-		if err := processor.ValidRecord(&l); err != nil {
-			log.Println(err)
-		} else {
-			logs = append(logs, l)
-		}
-	}
-	if err := sc.Err(); err != nil {
-		log.Println(err)
-	}
 	ctx := context.Background()
-	s := len(logs) / 1000
-	for i := 0; i < s; i++ {
-		err := db.InsertRecordBatch(ctx, logs[i*1000:(i+1)*1000])
-		if err != nil {
-			log.Fatal(err)
-		}
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+	err := processor.InsertBatch(ctx, db, os.Stdin)
+	if err != nil {
+		log.Fatal(err)
 	}
 	//genCSV(as)
 	//genReportCSV(as)
