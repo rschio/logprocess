@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -70,6 +71,14 @@ func main() {
 		err = processor.ServiceReportCSV(ctx, w, db, id)
 	case 3:
 		err = processor.AvgServicesLatenciesCSV(ctx, w, db)
+	case 4:
+		//err = processor.InsertRecord(ctx, db, os.Stdin)
+		rec := new(processor.Record)
+		err = json.NewDecoder(os.Stdin).Decode(rec)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = db.InsertRecord(ctx, rec)
 	default:
 		log.Println("flag f is required")
 		flag.Usage()
