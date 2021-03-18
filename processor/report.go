@@ -3,6 +3,7 @@ package processor
 import (
 	"context"
 	"io"
+	"log"
 	"time"
 
 	"github.com/dnlo/struct2csv"
@@ -47,6 +48,10 @@ type ReportRow struct {
 }
 
 func writeReportCSV(w io.Writer, report []ReportRow) error {
+	if len(report) == 0 {
+		log.Println("zero rows found")
+		return nil
+	}
 	wr := struct2csv.NewWriter(w)
 	return wr.WriteStructs(report)
 }
@@ -71,6 +76,10 @@ func AvgServicesLatenciesCSV(ctx context.Context, w io.Writer, db Storage) error
 	latencies, err := db.AverageServicesLatencies(ctx)
 	if err != nil {
 		return err
+	}
+	if len(latencies) == 0 {
+		log.Println("zero rows found")
+		return nil
 	}
 	wr := struct2csv.NewWriter(w)
 	return wr.WriteStructs(latencies)
