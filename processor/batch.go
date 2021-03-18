@@ -1,34 +1,26 @@
 package processor
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"io"
 )
 
-func readRecord(data []byte) (*Record, error) {
-	rec := new(Record)
-	if err := json.Unmarshal(data, rec); err != nil {
-		return nil, err
-	}
-	if err := ValidRecord(rec); err != nil {
-		return nil, err
-	}
-	return rec, nil
-}
-
 func readBatch(r io.Reader) ([]Record, error) {
-	sc := bufio.NewScanner(r)
+	dec := json.NewDecoder(r)
 	records := make([]Record, 0, 200)
-	for i := 0; sc.Scan(); i++ {
-		rec, err := readRecord(sc.Bytes())
-		if err != nil {
+	var err error
+	for {
+		rec := new(Record)
+		if err = dec.Decode(rec); err != nil {
+			break
+		}
+		if err = ValidRecord(rec); err != nil {
 			return nil, err
 		}
 		records = append(records, *rec)
 	}
-	if err := sc.Err(); err != nil {
+	if err != io.EOF {
 		return nil, err
 	}
 	return records, nil
