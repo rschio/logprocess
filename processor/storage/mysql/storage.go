@@ -91,19 +91,11 @@ func (m *MySQL) InsertRecordBatch(ctx context.Context, rs []processor.Record) er
 }
 
 func (m *MySQL) ServiceReport(ctx context.Context, id string) ([]processor.ReportRow, error) {
-	rows, err := m.q.GetServiceRequests(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return toReportRowsService(rows), nil
+	return m.q.GetServiceRequests(ctx, id)
 }
 
 func (m *MySQL) ConsumerReport(ctx context.Context, id string) ([]processor.ReportRow, error) {
-	rows, err := m.q.GetConsumerRequests(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return toReportRows(rows), nil
+	return m.q.GetConsumerRequests(ctx, id)
 }
 
 func (m *MySQL) AverageServicesLatencies(ctx context.Context) ([]processor.ServiceLatencies, error) {

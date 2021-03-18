@@ -98,27 +98,3 @@ func toServicesLatencies(avgLats []AverageLatencyByServiceRow) []processor.Servi
 	}
 	return slice
 }
-
-func toReportRow(row GetConsumerRequestsRow) processor.ReportRow {
-	return processor.ReportRow(row)
-}
-
-func toReportRows(rows []GetConsumerRequestsRow) []processor.ReportRow {
-	slice := make([]processor.ReportRow, len(rows))
-	for i, row := range rows {
-		slice[i] = toReportRow(row)
-	}
-	return slice
-}
-
-func toReportRowService(row GetServiceRequestsRow) processor.ReportRow {
-	return processor.ReportRow(row)
-}
-
-func toReportRowsService(rows []GetServiceRequestsRow) []processor.ReportRow {
-	slice := make([]processor.ReportRow, len(rows))
-	for i, row := range rows {
-		slice[i] = toReportRowService(row)
-	}
-	return slice
-}
