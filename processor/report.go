@@ -9,12 +9,16 @@ import (
 	"github.com/dnlo/struct2csv"
 )
 
+// ServiceLatencies reports the proxy, request and gateway
+// latencies of each service.
 type ServiceLatencies struct {
 	ID           string
 	Name         string
 	AvgLatencies Latencies
 }
 
+// ReportRow stores information about requests
+// and it's response.
 type ReportRow struct {
 	ID                               int64
 	ConsumerID                       string
@@ -56,6 +60,7 @@ func writeReportCSV(w io.Writer, report []ReportRow) error {
 	return wr.WriteStructs(report)
 }
 
+// ConsumerReportCSV generates a CSV requests report of a consumer with ID id.
 func ConsumerReportCSV(ctx context.Context, w io.Writer, db Storage, id string) error {
 	report, err := db.ConsumerReport(ctx, id)
 	if err != nil {
@@ -64,6 +69,7 @@ func ConsumerReportCSV(ctx context.Context, w io.Writer, db Storage, id string) 
 	return writeReportCSV(w, report)
 }
 
+// ServiceReportCSV generates a CSV requets report of a service with ID id.
 func ServiceReportCSV(ctx context.Context, w io.Writer, db Storage, id string) error {
 	report, err := db.ServiceReport(ctx, id)
 	if err != nil {
@@ -72,6 +78,7 @@ func ServiceReportCSV(ctx context.Context, w io.Writer, db Storage, id string) e
 	return writeReportCSV(w, report)
 }
 
+// AvgServicesLatenciesCSV generates a CSV latencies report of all services.
 func AvgServicesLatenciesCSV(ctx context.Context, w io.Writer, db Storage) error {
 	latencies, err := db.AverageServicesLatencies(ctx)
 	if err != nil {

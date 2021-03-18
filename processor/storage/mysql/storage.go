@@ -8,15 +8,18 @@ import (
 	"github.com/rschio/logprocess/processor"
 )
 
+// MySQL is a processor.Storage.
 type MySQL struct {
 	db *sql.DB
 	q  *Queries
 }
 
+// NewMySQL creates a new MySQL.
 func NewMySQL(db *sql.DB) *MySQL {
 	return &MySQL{db: db, q: New(db)}
 }
 
+// InsertRecordBatch implements the processor.Storage interface.
 func (m *MySQL) InsertRecordBatch(ctx context.Context, rs []processor.Record) error {
 	ss := make([]InsertServiceParams, len(rs))
 	srp := make([]InsertResponseParams, len(rs))
@@ -90,14 +93,17 @@ func (m *MySQL) InsertRecordBatch(ctx context.Context, rs []processor.Record) er
 	return nil
 }
 
+// ServiceReport implements the processor.Storage interface.
 func (m *MySQL) ServiceReport(ctx context.Context, id string) ([]processor.ReportRow, error) {
 	return m.q.GetServiceRequests(ctx, id)
 }
 
+// ConsumerReport implements the processor.Storage interface.
 func (m *MySQL) ConsumerReport(ctx context.Context, id string) ([]processor.ReportRow, error) {
 	return m.q.GetConsumerRequests(ctx, id)
 }
 
+// AverageServicesLatencies implements the processor.Storage interface.
 func (m *MySQL) AverageServicesLatencies(ctx context.Context) ([]processor.ServiceLatencies, error) {
 	avgLats, err := m.q.AverageLatencyByService(ctx)
 	if err != nil {
@@ -106,6 +112,7 @@ func (m *MySQL) AverageServicesLatencies(ctx context.Context) ([]processor.Servi
 	return toServicesLatencies(avgLats), nil
 }
 
+// InsertRecord implements the processor.Storage interface.
 func (m *MySQL) InsertRecord(ctx context.Context, r *processor.Record) error {
 	return m.InsertRecordBatch(ctx, []processor.Record{*r})
 }

@@ -42,11 +42,13 @@ SELECT
 	INNER JOIN requests rq ON r.request_id = rq.id
 `
 
+// GetConsumerRequests return information about consumer requests.
 func (q *Queries) GetConsumerRequests(ctx context.Context, consumerID string) ([]processor.ReportRow, error) {
 	stmt := reportRequests + " WHERE r.consumer_id = ?"
 	return q.getReportRequests(ctx, stmt, consumerID)
 }
 
+// GetServiceRequests return information about service requests.
 func (q *Queries) GetServiceRequests(ctx context.Context, serviceID string) ([]processor.ReportRow, error) {
 	stmt := reportRequests + " WHERE r.service_id = ?"
 	return q.getReportRequests(ctx, stmt, serviceID)

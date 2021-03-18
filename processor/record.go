@@ -1,5 +1,6 @@
 package processor
 
+// Record stores log information.
 type Record struct {
 	Request             Request             `json:"request"`
 	UpstreamURI         string              `json:"upstream_uri"`

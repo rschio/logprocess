@@ -47,6 +47,8 @@ func insertRecordBatch(ctx context.Context, db Storage, recs []Record) error {
 	return nil
 }
 
+// InsertBatch inserts a stream of log Records into the db Storage.
+// The insertion is made in batches.
 func InsertBatch(ctx context.Context, db Storage, r io.Reader) error {
 	recs, err := readBatch(r)
 	if err != nil {

@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+// createQuery assembly a query from using a stmt, a optional
+// suffix and the total number of args.
 func createQuery(stmt, suffix string, totalArgs int) string {
 	narg := strings.Count(stmt, ",") + 1
 	rows := totalArgs / narg

@@ -87,6 +87,7 @@ func validService(s *Service) error {
 	return nil
 }
 
+// ValidRecord checks if a record is valid.
 func ValidRecord(r *Record) error {
 	if r == nil {
 		return fmt.Errorf("nil Record")

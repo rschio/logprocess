@@ -27,6 +27,7 @@ type AverageLatencyByServiceRow struct {
 	AvgRequestLatency float64
 }
 
+// AverageLatencyByService returns the average latency of each service.
 func (q *Queries) AverageLatencyByService(ctx context.Context) ([]AverageLatencyByServiceRow, error) {
 	rows, err := q.db.QueryContext(ctx, averageLatencyByService)
 	if err != nil {
