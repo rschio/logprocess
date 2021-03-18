@@ -20,6 +20,15 @@ var (
 	dbenv   = os.Getenv("MYSQL_DATABASE")
 )
 
+var (
+	function = flag.Uint("f", 4, "What function to perform:\n\t"+
+		"0 - insert json logs (read from stdin)\n\t"+
+		"1 - consumer report\n\t"+
+		"2 - services report\n\t"+
+		"3 - average latencies report")
+	timeout = flag.Duration("t", 5*time.Minute, "Timeout")
+)
+
 func connectDB() processor.Storage {
 	info := fmt.Sprintf("%s:%s@/%s?parseTime=true", usrenv, passenv, dbenv)
 	conn, err := sql.Open("mysql", info)
@@ -31,15 +40,6 @@ func connectDB() processor.Storage {
 	}
 	return mysql.NewMySQL(conn)
 }
-
-var (
-	function = flag.Uint("f", 4, "What function to perform:\n\t"+
-		"0 - insert json logs (read from stdin)\n\t"+
-		"1 - consumer report\n\t"+
-		"2 - services report\n\t"+
-		"3 - average latencies report")
-	timeout = flag.Duration("t", 5*time.Minute, "Timeout")
-)
 
 func main() {
 	flag.Parse()
