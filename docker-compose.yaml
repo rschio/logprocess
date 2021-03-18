@@ -10,3 +10,4 @@ services:
         env.env
     volumes:
         - './storage/mysql/data:/var/lib/mysql'
+        - './storage/initschema:/docker-entrypoint-initdb.d'
