@@ -1,12 +1,3 @@
--- name: GetRecords :many
-SELECT * 
-	FROM records r
-	JOIN responses rp ON r.response_id = rp.id
-	JOIN requests rq ON r.request_id = rq.id
-	JOIN routes rt ON r.route_id = rt.id
-	JOIN services s ON r.service_id = s.id
-;
-
 -- name: GetServiceRequests :many
 SELECT
 	r.id,
@@ -80,8 +71,6 @@ SELECT
 	INNER JOIN requests rq ON r.request_id = rq.id
 	WHERE r.consumer_id = ?
 ;
-
-
 
 -- name: AverageLatencyByService :many
 SELECT 

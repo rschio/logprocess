@@ -4,9 +4,34 @@ import (
 	"context"
 	"database/sql"
 	"strings"
+	"time"
 )
 
-const insertServiceBatch = `-- name: InsertService :execresult
+func createQuery(stmt, suffix string, totalArgs int) string {
+	narg := strings.Count(stmt, ",") + 1
+	rows := totalArgs / narg
+	vals := strings.Repeat("?,", narg)
+	// Trim the last comma.
+	vals = "(" + vals[:len(vals)-1] + "),"
+	stmt += "VALUES "
+	stmt += strings.Repeat(vals, rows)
+	// Trim the last comma again.
+	stmt = stmt[:len(stmt)-1]
+	stmt += " " + suffix
+	return stmt
+}
+
+func (q *Queries) execBatch(ctx context.Context, stmt, suffix string,
+	args ...interface{}) (sql.Result, error) {
+
+	totalArgs := len(args)
+	stmt = createQuery(stmt, suffix, totalArgs)
+	return q.db.ExecContext(ctx, stmt, args...)
+}
+
+const suffixDupKey = `ON DUPLICATE KEY UPDATE id=id`
+
+const insertServiceBatch = `
 INSERT INTO services (
 	id,
 	created_at,
@@ -20,19 +45,25 @@ INSERT INTO services (
 	write_timeout,
 	connect_timeout,
 	retries
-) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
+)`
 
-const suffixDupKey = `ON DUPLICATE KEY UPDATE id=id`
+type InsertServiceParams struct {
+	ID             string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Host           string
+	Name           string
+	Path           string
+	Port           int64
+	Protocol       string
+	ReadTimeout    int64
+	WriteTimeout   int64
+	ConnectTimeout int64
+	Retries        int64
+}
 
 func (q *Queries) InsertServiceBatch(ctx context.Context, args []InsertServiceParams,
 ) (sql.Result, error) {
-	if len(args) == 1 {
-		return q.InsertService(ctx, args[0])
-	}
-	stmt := insertServiceBatch
-	argStmt := ", (?,?,?,?,?,?,?,?,?,?,?,?)"
-	stmt += strings.Repeat(argStmt, len(args)-1)
-
 	sliceArgs := make([]interface{}, 0, len(args)*12)
 	for _, arg := range args {
 		sliceArgs = append(sliceArgs,
@@ -50,8 +81,8 @@ func (q *Queries) InsertServiceBatch(ctx context.Context, args []InsertServicePa
 			arg.Retries,
 		)
 	}
-	stmt += suffixDupKey
-	return q.db.ExecContext(ctx, stmt, sliceArgs...)
+	stmt := insertServiceBatch
+	return q.execBatch(ctx, stmt, suffixDupKey, sliceArgs...)
 }
 
 const insertRouteBatch = `
@@ -67,15 +98,23 @@ INSERT INTO routes (
 	regex_priority,
 	service_id,
 	strip_path
-) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+)`
+
+type InsertRouteParams struct {
+	ID            string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Hosts         string
+	Methods       string
+	Paths         string
+	PreserveHost  int32
+	Protocols     string
+	RegexPriority int64
+	ServiceID     string
+	StripPath     int32
+}
 
 func (q *Queries) InsertRouteBatch(ctx context.Context, args []InsertRouteParams) (sql.Result, error) {
-	if len(args) == 1 {
-		return q.InsertRoute(ctx, args[0])
-	}
-	stmt := insertRouteBatch
-	argStmt := ", (?,?,?,?,?,?,?,?,?,?,?)"
-	stmt += strings.Repeat(argStmt, len(args)-1)
 	sliceArgs := make([]interface{}, 0, len(args)*11)
 	for _, arg := range args {
 		sliceArgs = append(sliceArgs,
@@ -92,24 +131,37 @@ func (q *Queries) InsertRouteBatch(ctx context.Context, args []InsertRouteParams
 			arg.StripPath,
 		)
 	}
-	stmt += suffixDupKey
-	return q.db.ExecContext(ctx, stmt, sliceArgs...)
+	stmt := insertRouteBatch
+	return q.execBatch(ctx, stmt, suffixDupKey, sliceArgs...)
 }
 
 const insertResponseBatch = `
 INSERT INTO responses (
-	id, status, size, content_length,
-	via, connection, access_control_allow_credentials,
-	access_control_allow_origin, content_type, server
-) VALUES (?,?,?,?,?,?,?,?,?,?)`
+	id,
+	status,
+	size,
+	content_length,
+	via,
+	connection, access_control_allow_credentials,
+	access_control_allow_origin,
+	content_type,
+	server
+)`
+
+type InsertResponseParams struct {
+	ID                            string
+	Status                        int64
+	Size                          int64
+	ContentLength                 int64
+	Via                           string
+	Connection                    string
+	AccessControlAllowCredentials string
+	AccessControlAllowOrigin      string
+	ContentType                   string
+	Server                        string
+}
 
 func (q *Queries) InsertResponseBatch(ctx context.Context, args []InsertResponseParams) (sql.Result, error) {
-	if len(args) == 1 {
-		return q.InsertResponse(ctx, args[0])
-	}
-	stmt := insertResponseBatch
-	argStmt := ", (?,?,?,?,?,?,?,?,?,?)"
-	stmt += strings.Repeat(argStmt, len(args)-1)
 	sliceArgs := make([]interface{}, 0, len(args)*10)
 	for _, arg := range args {
 		sliceArgs = append(sliceArgs,
@@ -125,23 +177,36 @@ func (q *Queries) InsertResponseBatch(ctx context.Context, args []InsertResponse
 			arg.Server,
 		)
 	}
-	return q.db.ExecContext(ctx, stmt, sliceArgs...)
+	stmt := insertResponseBatch
+	return q.execBatch(ctx, stmt, "", sliceArgs...)
 }
 
 const insertRequestBatch = `
 INSERT INTO requests (
-	id, method, uri, url, size, querystring,
-	header_accept, header_host,
+	id,
+	method,
+	uri,
+	url,
+	size,
+	querystring,
+	header_accept,
+	header_host,
 	header_user_agent
-) VALUES (?,?,?,?,?,?,?,?,?)`
+)`
+
+type InsertRequestParams struct {
+	ID              string
+	Method          string
+	Uri             string
+	Url             string
+	Size            int64
+	Querystring     string
+	HeaderAccept    string
+	HeaderHost      string
+	HeaderUserAgent string
+}
 
 func (q *Queries) InsertRequestBatch(ctx context.Context, args []InsertRequestParams) (sql.Result, error) {
-	if len(args) == 1 {
-		return q.InsertRequest(ctx, args[0])
-	}
-	stmt := insertRequestBatch
-	argStmt := ", (?,?,?,?,?,?,?,?,?)"
-	stmt += strings.Repeat(argStmt, len(args)-1)
 	sliceArgs := make([]interface{}, 0, len(args)*9)
 	for _, arg := range args {
 		sliceArgs = append(sliceArgs,
@@ -156,7 +221,8 @@ func (q *Queries) InsertRequestBatch(ctx context.Context, args []InsertRequestPa
 			arg.HeaderUserAgent,
 		)
 	}
-	return q.db.ExecContext(ctx, stmt, sliceArgs...)
+	stmt := insertRequestBatch
+	return q.execBatch(ctx, stmt, "", sliceArgs...)
 }
 
 const insertRecordBatch = `
@@ -172,15 +238,23 @@ INSERT INTO records (
 	request_latency,
 	client_ip,
 	started_at
-) VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+)`
+
+type InsertRecordParams struct {
+	ConsumerID     string
+	UpstreamUri    string
+	ResponseID     string
+	RequestID      string
+	RouteID        string
+	ServiceID      string
+	ProxyLatency   int64
+	GatewayLatency int64
+	RequestLatency int64
+	ClientIp       string
+	StartedAt      time.Time
+}
 
 func (q *Queries) InsertRecordBatch(ctx context.Context, args []InsertRecordParams) (sql.Result, error) {
-	if len(args) == 1 {
-		return q.InsertRecord(ctx, args[0])
-	}
-	stmt := insertRecordBatch
-	argStmt := ", (?,?,?,?,?,?,?,?,?,?,?)"
-	stmt += strings.Repeat(argStmt, len(args)-1)
 	sliceArgs := make([]interface{}, 0, len(args)*11)
 	for _, arg := range args {
 		sliceArgs = append(sliceArgs,
@@ -197,5 +271,6 @@ func (q *Queries) InsertRecordBatch(ctx context.Context, args []InsertRecordPara
 			arg.StartedAt,
 		)
 	}
-	return q.db.ExecContext(ctx, stmt, sliceArgs...)
+	stmt := insertRecordBatch
+	return q.execBatch(ctx, stmt, "", sliceArgs...)
 }

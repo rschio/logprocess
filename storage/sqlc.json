@@ -4,7 +4,7 @@
     {
 	  "name": "mysql",
 	  "path": "../processor/storage/mysql/",
-      "schema": "schema.sql",
+      "schema": "initschema/schema.sql",
       "queries": "query.sql",
       "engine": "mysql"
     }
