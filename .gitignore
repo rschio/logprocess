@@ -1,7 +1,6 @@
 # Binaries
 processor/processor
 storage/mysql
-env.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
