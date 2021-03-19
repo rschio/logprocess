@@ -1,6 +1,6 @@
 # Binaries
 processor/processor
-storage/mysql
+storage/mysql/data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
